@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ערוצי ישראל</title>
+<meta name="description" content="Israeli live TV channels that stream outside Israel, for TV browsers and phones.">
+<meta name="theme-color" content="#081425">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ערוצי ישראל">
+<meta name="color-scheme" content="dark">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;700&display=swap">
+<style>
+  /* Layout: one dark living-room screen. A short header with Israel and local clocks,
+     then a grid of large remote-friendly channel tiles, then a full-screen player overlay. */
+  :root {
+    --bg: #081425;
+    --surface: #10213a;
+    --surface-2: #182d4b;
+    --line: #27405f;
+    --fg: #f3efe6;
+    --muted: #9fb0c7;
+    --accent: #ffd166;
+    --accent-ink: #1a1200;
+    --blue: #2f6fe6;
+    --ok: #39c37d;
+    --warn: #ffb547;
+    --bad: #ff6b6b;
+    --font-display: "Frank Ruhl Libre", "Times New Roman", "David", serif;
+    --font-ui: "Heebo", "Arial Hebrew", "Noto Sans Hebrew", Arial, system-ui, sans-serif;
+    --radius: 14px;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-ui);
+    font-size: 18px;
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+  }
+  #app {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-block: calc(24px + env(safe-area-inset-top, 0px)) calc(40px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 32px;
+    max-width: 1600px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .brand h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(32px, 4vw, 56px);
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .brand .sub {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: clamp(16px, 1.4vw, 22px);
+    letter-spacing: 0.02em;
+  }
+  .clocks { display: flex; gap: 28px; }
+  .clock { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .clock-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .clock-time {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .hint {
+    flex-basis: 100%;
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+  }
+  .hint kbd {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--fg);
+    margin-inline-end: 6px;
+  }
+  body.touch .hint { display: none; }
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    max-width: 1600px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .group h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(22px, 2vw, 30px);
+    margin: 0 0 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .group h2 span { color: var(--muted); font-family: var(--font-ui); font-size: 16px; font-weight: 400; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
+    gap: 18px;
+  }
+  .tile {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 10px;
+    min-width: 0;
+    min-height: 168px;
+    padding: 18px 20px 16px;
+    box-sizing: border-box;
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: linear-gradient(160deg, var(--surface-2), var(--surface));
+    color: var(--fg);
+    text-align: start;
+    font-family: var(--font-ui);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  }
+  .tile:hover { border-color: var(--muted); }
+  .tile:focus { outline: none; }
+  .tile:focus-visible, .tile.is-focused {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.35), 0 10px 30px rgba(0, 0, 0, 0.35);
+    transform: scale(1.03);
+    z-index: 1;
+  }
+  body.touch .tile.is-focused { border-color: var(--line); box-shadow: none; transform: none; }
+  .tile.is-last { border-color: var(--blue); }
+  body.touch .tile.is-last { border-color: var(--blue); }
+  .tile-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .num {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .chip {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .chip.live { background: rgba(47, 111, 230, 0.25); color: #bcd0ff; }
+  .chip.last { background: rgba(57, 195, 125, 0.2); color: #9ff0c7; }
+  .name-he {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 2.2vw, 32px);
+    font-weight: 700;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+  .name-en { color: var(--muted); font-size: 15px; margin-top: 4px; }
+  .tile-foot { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 14px; }
+  .tile-foot .src { direction: ltr; unicode-bidi: isolate; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+  .note {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    background: var(--surface);
+    display: grid;
+    gap: 8px;
+  }
+  .note h2 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 22px; }
+  .note p { margin: 0; color: var(--muted); }
+  .note .links { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 4px; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  footer {
+    max-width: 1600px;
+    width: 100%;
+    margin-inline: auto;
+    color: var(--muted);
+    font-size: 14px;
+    display: grid;
+    gap: 6px;
+  }
+  footer p { margin: 0; }
+
+  /* Player overlay */
+  .player {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+  }
+  .player video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    flex: 1;
+    min-height: 0;
+  }
+  .bar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
+    transition: opacity 200ms ease;
+  }
+  /* With native video controls (iPhone, Safari) the channel bar moves to the top so the two never overlap */
+  .player.native .bar {
+    bottom: auto; top: 0;
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    padding-bottom: 20px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
+  }
+  .player.native .status { display: none; }
+  .bar.hidden-bar { opacity: 0; pointer-events: none; }
+  .now { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
+  .now .num { font-size: 40px; }
+  .now .name-he { font-size: clamp(26px, 3vw, 40px); }
+  .now .name-en { font-size: 16px; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    font-family: var(--font-ui);
+    font-size: 18px;
+    font-weight: 500;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    cursor: pointer;
+    min-width: 0;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn:hover { background: rgba(255, 255, 255, 0.2); }
+  .btn.primary:hover { background: #ffdc85; }
+  .btn:focus { outline: none; }
+  .btn:focus-visible { box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.6); border-color: var(--accent); }
+  .status {
+    position: absolute;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    inset-inline-start: max(16px, env(safe-area-inset-left, 0px));
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 200ms ease;
+  }
+  .status::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--warn); }
+  .status.live::before { background: var(--bad); box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.3); }
+  .status.err::before { background: var(--muted); }
+  .status.hidden-bar { opacity: 0; }
+  .digits {
+    position: absolute;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    inset-inline-end: max(16px, env(safe-area-inset-right, 0px));
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 18px;
+    border-radius: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .msg {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 14px;
+    text-align: center;
+    padding: 24px;
+    background: rgba(8, 20, 37, 0.92);
+  }
+  .msg h2 { margin: 0; font-family: var(--font-display); font-size: clamp(26px, 3vw, 40px); font-weight: 700; text-wrap: balance; }
+  .msg p { margin: 0; color: var(--muted); max-width: 60ch; }
+  .msg .controls { justify-content: center; margin-top: 8px; }
+  @media (max-width: 700px) {
+    body { font-size: 16px; }
+    .clocks { gap: 18px; }
+    .tile { min-height: 140px; padding: 14px 16px 12px; }
+    .bar { padding: 14px; }
+    .now .num { font-size: 30px; }
+    .btn { font-size: 16px; padding: 10px 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile, .bar, .status { transition: none; }
+    .tile:focus-visible, .tile.is-focused { transform: none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <h1>ערוצי ישראל</h1>
+      <p class="sub">Israel Live TV</p>
+    </div>
+    <div class="clocks" aria-label="שעונים">
+      <div class="clock"><span class="clock-label">ישראל</span><span class="clock-time" id="clockIL">--:--</span></div>
+      <div class="clock"><span class="clock-label">מקומי</span><span class="clock-time" id="clockLocal">--:--</span></div>
+    </div>
+    <p class="hint">
+      <span><kbd>חיצים</kbd>בחירה</span>
+      <span><kbd>OK</kbd>הפעלה</span>
+      <span><kbd>0-9</kbd>מספר ערוץ</span>
+      <span><kbd>חזור</kbd>יציאה מהשידור</span>
+      <span lang="en" dir="ltr">Arrows to pick, OK to play, number keys to jump, Back to exit</span>
+    </p>
+  </header>
+
+  <main>
+    <section class="group" aria-labelledby="hHe">
+      <h2 id="hHe">עברית <span lang="en">Hebrew</span></h2>
+      <div class="grid" id="gridHe"></div>
+    </section>
+    <section class="group" aria-labelledby="hOther">
+      <h2 id="hOther">שפות נוספות <span lang="en">Russian, English, Arabic</span></h2>
+      <div class="grid" id="gridOther"></div>
+    </section>
+    <section class="note" aria-labelledby="hNote">
+      <h2 id="hNote">לא זמין בחינם מחוץ לישראל</h2>
+      <p>קשת 12, רשת 13, ספורט 5 וערוצי yes ו-HOT חסומים לצפייה מחוץ לישראל. הדרך המורשית לצפות בהם מחו"ל היא Screen iL, שירות סטרימינג בתשלום לישראלים בחו"ל, עם אפליקציה ל-Roku, Android, Apple ו-Smart TV.</p>
+      <p lang="en" dir="ltr">Keshet 12, Reshet 13, Sport 5 and the yes/HOT channels do not stream free outside Israel. The licensed route is Screen iL, a paid streaming service for Israelis abroad with apps for Roku, Android, Apple and smart TVs.</p>
+      <div class="links" dir="ltr">
+        <a href="https://channelstore.roku.com/details/74f6e67154aeba887735f7716cadad81:e3c3e84adfea5714055d1da97ab2ecac/screen-il-israeli-tv" target="_blank" rel="noopener">Screen iL on Roku</a>
+        <a href="https://play.google.com/store/apps/details?id=com.streamil.client.android.mobile&amp;hl=en_US" target="_blank" rel="noopener">Screen iL on Google Play</a>
+        <a href="https://apps.apple.com/us/app/id1547247332" target="_blank" rel="noopener">Screen iL on the App Store</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>הערוצים בעמוד זה מתנגנים מהזרמים הציבוריים שהערוצים עצמם או ספקי הסטרימינג שלהם מפרסמים. אין כאן שידורים חוזרים של ערוצי טלוויזיה בתשלום.</p>
+    <p lang="en" dir="ltr">Channels on this page play from the public web feeds published by the channels themselves or their streaming providers. No pay TV restreams.</p>
+    <p lang="en" dir="ltr" id="siteLinks"></p>
+  </footer>
+</div>
+
+<div id="player" class="player" hidden>
+  <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow" preload="none"></video>
+  <div class="status" id="status" aria-live="polite">מתחבר</div>
+  <div class="digits" id="digits" hidden></div>
+  <div class="bar" id="bar">
+    <div class="now">
+      <span class="num" id="nowNum"></span>
+      <span>
+        <div class="name-he" id="nowHe"></div>
+        <div class="name-en" id="nowEn" dir="ltr"></div>
+      </span>
+    </div>
+    <div class="controls">
+      <button class="btn" id="btnPrev" type="button">ערוץ קודם</button>
+      <button class="btn" id="btnNext" type="button">ערוץ הבא</button>
+      <button class="btn" id="btnAirplay" type="button" hidden>AirPlay</button>
+      <button class="btn primary" id="btnBack" type="button">חזרה לערוצים</button>
+    </div>
+  </div>
+  <div class="msg" id="msg" hidden>
+    <h2 id="msgTitle">הערוץ לא זמין כרגע</h2>
+    <p id="msgText"></p>
+    <div class="controls">
+      <button class="btn primary" id="btnRetry" type="button">נסה שוב</button>
+      <a class="btn" id="btnSite" href="#" target="_blank" rel="noopener">האתר הרשמי</a>
+      <button class="btn" id="btnBack2" type="button">חזרה לערוצים</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.20/hls.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var CHANNELS = [
+    { id: "kan11", he: "כאן 11", en: "Kan 11", lang: "עברית", group: "he", site: "https://www.kan.org.il/live/", host: "kan.org.il",
+      src: ["https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8"] },
+    { id: "now14", he: "עכשיו 14", en: "Now 14", lang: "עברית", group: "he", site: "https://www.now14.co.il/", host: "now14.co.il",
+      src: ["https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8"] },
+    { id: "i24he", he: "i24NEWS עברית", en: "i24NEWS Hebrew", lang: "עברית", group: "he", site: "https://www.i24news.tv/he", host: "i24news.tv",
+      src: ["https://i24newshebrew-cdn.encoders.immergo.tv/master.m3u8"] },
+    { id: "ch16", he: "ערוץ 16", en: "Channel 16", lang: "עברית", group: "he", site: "https://www.ice.co.il/tv/news/article/1118205", host: "new in 2026",
+      src: ["https://ch16israel-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8"] },
+    { id: "hidabroot", he: "הידברות", en: "Hidabroot", lang: "עברית", group: "he", site: "https://www.hidabroot.org/", host: "hidabroot.org",
+      src: ["https://cdn.cybercdn.live/HidabrootIL/Live97/playlist.m3u8"] },
+    { id: "knesset", he: "ערוץ הכנסת", en: "Knesset Channel", lang: "עברית", group: "he", site: "https://www.knesset.tv/", host: "knesset.tv",
+      src: ["https://contact.gostreaming.tv/Knesset/index.m3u8"] },
+    { id: "kab", he: "קבלה לעם", en: "Kabbalah for the People", lang: "עברית", group: "he", site: "https://www.kab.co.il/", host: "kab.co.il",
+      src: ["https://edge3.uk.kab.tv/live/tv66-heb-high/playlist.m3u8"] },
+    { id: "ch9", he: "ערוץ 9", en: "Channel 9 (Russian)", lang: "русский", group: "other", site: "https://www.9tv.co.il/", host: "9tv.co.il",
+      src: ["https://contact.gostreaming.tv/Con-11/index.m3u8"] },
+    { id: "i24en", he: "i24NEWS English", en: "i24NEWS English", lang: "English", group: "other", site: "https://www.i24news.tv/en", host: "i24news.tv",
+      src: ["https://i24newsenglish-cdn.encoders.immergo.tv/master.m3u8", "https://hlspackager.akamaized.net/live/DB/i24_ENGLISH/HLS/i24_ENGLISH.m3u8"] },
+    { id: "makan33", he: "מכאן 33", en: "Makan 33 (Arabic)", lang: "عربي", group: "other", site: "https://www.kan.org.il/live/", host: "kan.org.il",
+      src: ["https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/makan/live.livx/playlist.m3u8"] },
+    { id: "hala", he: "Hala TV", en: "Hala TV (Arabic)", lang: "عربي", group: "other", site: "https://panet.com/", host: "panet.com",
+      src: ["https://stream.panet.com/edge/halaTV/playlist.m3u8"] }
+  ];
+
+  var STORE_KEY = "israel-tv-last";
+  var ua = navigator.userAgent || "";
+  var isIOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isSafari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|Edg|OPR|SamsungBrowser/.test(ua);
+  var isTouch = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+  var state = { current: -1, srcIndex: 0, hls: null, barTimer: null, retried: false, focusIdx: 0, digitBuf: "", digitTimer: null, mode: "" };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var gridHe = $("gridHe"), gridOther = $("gridOther");
+  var player = $("player"), video = $("video"), bar = $("bar"), status = $("status"), msg = $("msg"), digits = $("digits");
+
+  if (isTouch) document.body.classList.add("touch");
+
+  function readLast() {
+    try { var v = localStorage.getItem(STORE_KEY); return v ? parseInt(v, 10) : -1; } catch (e) { return -1; }
+  }
+  function writeLast(i) {
+    try { localStorage.setItem(STORE_KEY, String(i)); } catch (e) { }
+  }
+
+  /* Tiles */
+  var tiles = [];
+  function buildTiles() {
+    var last = readLast();
+    CHANNELS.forEach(function (ch, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "tile" + (i === last ? " is-last" : "");
+      b.setAttribute("data-idx", String(i));
+      b.setAttribute("aria-label", (i + 1) + " " + ch.he + " " + ch.en);
+      b.innerHTML =
+        '<div class="tile-head"><span class="num">' + (i + 1) + '</span>' +
+        '<span class="chips"><span class="chip live">Live</span>' + (i === last ? '<span class="chip last">אחרון</span>' : '') + '</span></div>' +
+        '<div><div class="name-he">' + ch.he + '</div><div class="name-en" dir="ltr">' + ch.en + '</div></div>' +
+        '<div class="tile-foot"><span>' + ch.lang + '</span><span class="src">' + ch.host + '</span></div>';
+      b.addEventListener("click", function () { play(i); });
+      b.addEventListener("focus", function () { state.focusIdx = i; });
+      (ch.group === "he" ? gridHe : gridOther).appendChild(b);
+      tiles.push(b);
+    });
+    var links = CHANNELS.map(function (ch) {
+      return '<a href="' + ch.site + '" target="_blank" rel="noopener">' + ch.en + '</a>';
+    });
+    $("siteLinks").innerHTML = "Official sites: " + links.join(" | ");
+  }
+
+  function focusTile(i, noScroll) {
+    if (i < 0 || i >= tiles.length) return;
+    tiles.forEach(function (t) { t.classList.remove("is-focused"); });
+    tiles[i].classList.add("is-focused");
+    if (!isTouch) { try { tiles[i].focus({ preventScroll: !!noScroll }); } catch (e) { tiles[i].focus(); } }
+    state.focusIdx = i;
+  }
+
+  function center(r) { return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }; }
+
+  function spatialMove(dir) {
+    var cur = tiles[state.focusIdx];
+    if (!cur) { focusTile(0); return; }
+    var cr = cur.getBoundingClientRect(), cc = center(cr);
+    var best = -1, bestScore = Infinity, i, r, c, dx, dy;
+    for (i = 0; i < tiles.length; i++) {
+      if (i === state.focusIdx) continue;
+      r = tiles[i].getBoundingClientRect(); c = center(r);
+      dx = c.x - cc.x; dy = c.y - cc.y;
+      var ok = false, score = 0;
+      if (dir === "left" && dx < -1 && Math.abs(dy) < cr.height * 0.6) { ok = true; score = Math.abs(dx); }
+      if (dir === "right" && dx > 1 && Math.abs(dy) < cr.height * 0.6) { ok = true; score = Math.abs(dx); }
+      if (dir === "up" && dy < -1) { ok = true; score = Math.abs(dy) * 10 + Math.abs(dx); }
+      if (dir === "down" && dy > 1) { ok = true; score = Math.abs(dy) * 10 + Math.abs(dx); }
+      if (ok && score < bestScore) { bestScore = score; best = i; }
+    }
+    if (best === -1) {
+      /* End of a row: step through DOM order so the remote never gets stuck. RTL: right is earlier. */
+      if (dir === "right" && state.focusIdx > 0) best = state.focusIdx - 1;
+      if (dir === "left" && state.focusIdx < tiles.length - 1) best = state.focusIdx + 1;
+    }
+    if (best !== -1) focusTile(best);
+  }
+
+  /* Clocks */
+  function fmt(tz) {
+    try {
+      var opts = { hour: "2-digit", minute: "2-digit", hour12: false };
+      if (tz) opts.timeZone = tz;
+      return new Intl.DateTimeFormat("en-GB", opts).format(new Date());
+    } catch (e) { return null; }
+  }
+  function tick() {
+    var il = fmt("Asia/Jerusalem");
+    var lo = fmt(null);
+    $("clockIL").textContent = il || "";
+    $("clockLocal").textContent = lo || (new Date()).toTimeString().slice(0, 5);
+  }
+
+  /* Player */
+  function setStatus(kind, text) {
+    status.className = "status " + kind;
+    status.textContent = text;
+  }
+  function showBar() {
+    bar.classList.remove("hidden-bar");
+    status.classList.remove("hidden-bar");
+    clearTimeout(state.barTimer);
+    state.barTimer = setTimeout(function () {
+      if (msg.hidden) { bar.classList.add("hidden-bar"); status.classList.add("hidden-bar"); }
+    }, 4500);
+  }
+  function destroyHls() {
+    if (state.hls) { try { state.hls.destroy(); } catch (e) { } state.hls = null; }
+  }
+  function showError(ch) {
+    msg.hidden = false;
+    $("msgTitle").textContent = ch.he + " לא זמין כרגע";
+    $("msgText").textContent = "השידור לא נטען. או שהערוץ חסום לצפייה מחוץ לישראל כרגע, או שהזרם שלו ירד. אפשר לנסות שוב או לפתוח את האתר הרשמי.";
+    $("btnSite").href = ch.site;
+    setStatus("err", "לא זמין");
+    showBar();
+    if (!isTouch) $("btnRetry").focus();
+  }
+  function hideError() { msg.hidden = true; }
+
+  function pickMode() {
+    var native = video.canPlayType("application/vnd.apple.mpegurl") || video.canPlayType("application/x-mpegURL");
+    var mse = !!(window.Hls && Hls.isSupported());
+    if (native && (isIOS || isSafari || !mse)) return "native";
+    if (mse) return "hls";
+    return native ? "native" : "none";
+  }
+
+  function startSource(ch, url) {
+    destroyHls();
+    hideError();
+    setStatus("connecting", "מתחבר");
+    video.pause();
+    video.onerror = null;
+    video.removeAttribute("src");
+    try { video.load(); } catch (e) { }
+
+    var mode = state.mode || (state.mode = pickMode());
+    player.classList.toggle("native", mode === "native");
+    video.controls = (mode === "native");
+
+    if (mode === "hls") {
+      var hls = new Hls({ enableWorker: true, lowLatencyMode: false, backBufferLength: 30, maxBufferLength: 30, liveSyncDurationCount: 3 });
+      state.hls = hls;
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        var p = video.play(); if (p && p.catch) p.catch(function () { });
+      });
+      hls.on(Hls.Events.FRAG_BUFFERED, function () { if (!video.paused) setStatus("live", "Live"); });
+      hls.on(Hls.Events.ERROR, function (evt, data) {
+        if (!data || !data.fatal) return;
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR && !state.retried) { state.retried = true; hls.recoverMediaError(); return; }
+        nextSourceOrFail(ch);
+      });
+      hls.loadSource(url);
+      hls.attachMedia(video);
+    } else if (mode === "native") {
+      video.onerror = function () { nextSourceOrFail(ch); };
+      video.src = url;
+      var pp = video.play(); if (pp && pp.catch) pp.catch(function () { });
+    } else {
+      msg.hidden = false;
+      $("msgTitle").textContent = "הדפדפן הזה לא מנגן שידורים חיים";
+      $("msgText").textContent = "נסו לפתוח את העמוד בדפדפן אחר, או את האתר הרשמי של הערוץ.";
+      $("btnSite").href = ch.site;
+      setStatus("err", "לא נתמך");
+    }
+  }
+
+  function nextSourceOrFail(ch) {
+    state.srcIndex += 1;
+    if (state.srcIndex < ch.src.length) { startSource(ch, ch.src[state.srcIndex]); }
+    else { destroyHls(); showError(ch); }
+  }
+
+  function play(i) {
+    if (i < 0 || i >= CHANNELS.length) return;
+    var ch = CHANNELS[i];
+    state.current = i; state.srcIndex = 0; state.retried = false;
+    writeLast(i);
+    player.hidden = false;
+    $("nowNum").textContent = i + 1;
+    $("nowHe").textContent = ch.he;
+    $("nowEn").textContent = ch.en;
+    showBar();
+    startSource(ch, ch.src[0]);
+    if (!isIOS && document.documentElement.requestFullscreen && !document.fullscreenElement) {
+      try { var fp = document.documentElement.requestFullscreen(); if (fp && fp.catch) fp.catch(function () { }); } catch (e) { }
+    }
+  }
+
+  function markLast() {
+    tiles.forEach(function (t, k) {
+      t.classList.toggle("is-last", k === state.current);
+      var c = t.querySelector(".chip.last"); if (c) c.remove();
+      if (k === state.current) t.querySelector(".chips").insertAdjacentHTML("beforeend", '<span class="chip last">אחרון</span>');
+    });
+  }
+
+  function stop() {
+    destroyHls();
+    video.pause();
+    video.onerror = null;
+    video.removeAttribute("src");
+    try { video.load(); } catch (e) { }
+    hideError();
+    player.hidden = true;
+    clearTimeout(state.barTimer);
+    if (document.fullscreenElement && document.exitFullscreen) {
+      try { var xp = document.exitFullscreen(); if (xp && xp.catch) xp.catch(function () { }); } catch (e) { }
+    }
+    if (state.current >= 0) markLast();
+    focusTile(state.current >= 0 ? state.current : 0);
+  }
+
+  function step(delta) {
+    var n = CHANNELS.length;
+    play((state.current + delta + n) % n);
+  }
+
+  /* Channel numbers typed on a remote: 1-9 play at once when no longer number fits, 1 then 1 plays 11 */
+  function pushDigit(d) {
+    clearTimeout(state.digitTimer);
+    state.digitBuf += d;
+    digits.textContent = state.digitBuf;
+    digits.hidden = false;
+    var n = parseInt(state.digitBuf, 10);
+    if (n * 10 > CHANNELS.length || state.digitBuf.length >= 2) { commitDigits(); }
+    else { state.digitTimer = setTimeout(commitDigits, 1500); }
+  }
+  function commitDigits() {
+    var n = parseInt(state.digitBuf, 10);
+    state.digitBuf = "";
+    digits.hidden = true;
+    if (n >= 1 && n <= CHANNELS.length) play(n - 1);
+  }
+
+  /* Remote and keyboard */
+  var BACK_KEYS = { "Escape": 1, "Backspace": 1, "BrowserBack": 1, "GoBack": 1 };
+  var BACK_CODES = { 10009: 1, 461: 1, 27: 1, 8: 1 };
+  document.addEventListener("keydown", function (e) {
+    var k = e.key, code = e.keyCode;
+    var inPlayer = !player.hidden;
+    var isBack = BACK_KEYS[k] || BACK_CODES[code];
+    if (/^[0-9]$/.test(k)) { e.preventDefault(); if (inPlayer) showBar(); pushDigit(k); return; }
+    if (inPlayer) {
+      showBar();
+      if (isBack) { e.preventDefault(); stop(); return; }
+      if (k === "ArrowUp" || k === "ChannelUp" || k === "PageUp" || k === "MediaTrackNext") { e.preventDefault(); step(1); return; }
+      if (k === "ArrowDown" || k === "ChannelDown" || k === "PageDown" || k === "MediaTrackPrevious") { e.preventDefault(); step(-1); return; }
+      if (k === "MediaPlayPause" || k === "MediaPlay" || k === "MediaPause") { e.preventDefault(); if (video.paused) video.play(); else video.pause(); return; }
+      return;
+    }
+    if (k === "ArrowLeft") { e.preventDefault(); spatialMove("left"); }
+    else if (k === "ArrowRight") { e.preventDefault(); spatialMove("right"); }
+    else if (k === "ArrowUp") { e.preventDefault(); spatialMove("up"); }
+    else if (k === "ArrowDown") { e.preventDefault(); spatialMove("down"); }
+  });
+
+  player.addEventListener("mousemove", showBar);
+  player.addEventListener("touchstart", showBar, { passive: true });
+  video.addEventListener("click", function () {
+    if (video.controls) return;
+    if (bar.classList.contains("hidden-bar")) showBar(); else { bar.classList.add("hidden-bar"); status.classList.add("hidden-bar"); }
+  });
+  video.addEventListener("playing", function () { setStatus("live", "Live"); });
+  video.addEventListener("waiting", function () { setStatus("connecting", "טוען"); });
+  $("btnPrev").addEventListener("click", function () { step(-1); });
+  $("btnNext").addEventListener("click", function () { step(1); });
+  $("btnBack").addEventListener("click", stop);
+  $("btnBack2").addEventListener("click", stop);
+  $("btnRetry").addEventListener("click", function () { if (state.current >= 0) play(state.current); });
+
+  /* AirPlay picker (Safari and iPhone only) */
+  if (window.WebKitPlaybackTargetAvailabilityEvent && typeof video.webkitShowPlaybackTargetPicker === "function") {
+    video.addEventListener("webkitplaybacktargetavailabilitychanged", function (e) {
+      $("btnAirplay").hidden = (e.availability !== "available");
+    });
+    $("btnAirplay").addEventListener("click", function () { try { video.webkitShowPlaybackTargetPicker(); } catch (e) { } });
+  }
+
+  /* Keep playing after the app returns to the foreground on a phone */
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && !player.hidden && video.paused && msg.hidden) { var p = video.play(); if (p && p.catch) p.catch(function () { }); }
+  });
+
+  buildTiles();
+  tick();
+  setInterval(tick, 30000);
+  var last = readLast();
+  focusTile(last >= 0 && last < tiles.length ? last : 0, true);
+  window.scrollTo(0, 0);
+
+  window.IsraelTV = { channels: CHANNELS, play: play, stop: stop, video: video, state: state };
+})();
+</script>
+</body>
+</html>
