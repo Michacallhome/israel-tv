@@ -380,13 +380,13 @@
       <div class="grid" id="gridHe"></div>
     </section>
     <section class="group" aria-labelledby="hOther">
-      <h2 id="hOther">שפות נוספות <span lang="en">Russian, English, Arabic</span></h2>
+      <h2 id="hOther">שפות נוספות <span lang="en">Russian, English, French, Arabic, Persian</span></h2>
       <div class="grid" id="gridOther"></div>
     </section>
     <section class="note" aria-labelledby="hNote">
       <h2 id="hNote">לא זמין בחינם מחוץ לישראל</h2>
-      <p>קשת 12, רשת 13, ספורט 5 וערוצי yes ו-HOT חסומים לצפייה מחוץ לישראל. הדרך המורשית לצפות בהם מחו"ל היא Screen iL, שירות סטרימינג בתשלום לישראלים בחו"ל, עם אפליקציה ל-Roku, Android, Apple ו-Smart TV.</p>
-      <p lang="en" dir="ltr">Keshet 12, Reshet 13, Sport 5 and the yes/HOT channels do not stream free outside Israel. The licensed route is Screen iL, a paid streaming service for Israelis abroad with apps for Roku, Android, Apple and smart TVs.</p>
+      <p>קשת 12, ספורט 5 וערוצי yes ו-HOT חסומים לצפייה מחוץ לישראל. הדרך המורשית לצפות בהם מחו"ל היא Screen iL, שירות סטרימינג בתשלום לישראלים בחו"ל, עם אפליקציה ל-Roku, Android, Apple ו-Smart TV.</p>
+      <p lang="en" dir="ltr">Keshet 12, Sport 5 and the yes/HOT channels do not stream free outside Israel. The licensed route is Screen iL, a paid streaming service for Israelis abroad with apps for Roku, Android, Apple and smart TVs.</p>
       <div class="links" dir="ltr">
         <a href="https://channelstore.roku.com/details/74f6e67154aeba887735f7716cadad81:e3c3e84adfea5714055d1da97ab2ecac/screen-il-israeli-tv" target="_blank" rel="noopener">Screen iL on Roku</a>
         <a href="https://play.google.com/store/apps/details?id=com.streamil.client.android.mobile&amp;hl=en_US" target="_blank" rel="noopener">Screen iL on Google Play</a>
@@ -440,29 +440,45 @@
   var CHANNELS = [
     { id: "kan11", he: "כאן 11", en: "Kan 11", lang: "עברית", group: "he", site: "https://www.kan.org.il/live/", host: "kan.org.il",
       src: ["https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8"] },
+    { id: "reshet13", he: "רשת 13", en: "Reshet 13", lang: "עברית", group: "he", site: "https://13tv.co.il/", host: "13tv.co.il",
+      src: ["https://d2xg1g9o5vns8m.cloudfront.net/out/v1/0855d703f7d5436fae6a9c7ce8ca5075/index.m3u8"] },
     { id: "now14", he: "עכשיו 14", en: "Now 14", lang: "עברית", group: "he", site: "https://www.now14.co.il/", host: "now14.co.il",
       src: ["https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8"] },
+    { id: "kanedu", he: "כאן חינוכית", en: "Kan Hinuchit (23)", lang: "עברית", group: "he", site: "https://www.kankids.org.il/kids-live/", host: "kankids.org.il",
+      src: ["https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan_edu/live.livx/playlist.m3u8"] },
     { id: "i24he", he: "i24NEWS עברית", en: "i24NEWS Hebrew", lang: "עברית", group: "he", site: "https://www.i24news.tv/he", host: "i24news.tv",
       src: ["https://i24newshebrew-cdn.encoders.immergo.tv/master.m3u8"] },
     { id: "ch16", he: "ערוץ 16", en: "Channel 16", lang: "עברית", group: "he", site: "https://www.ice.co.il/tv/news/article/1118205", host: "new in 2026",
       src: ["https://ch16israel-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8"] },
-    { id: "hidabroot", he: "הידברות", en: "Hidabroot", lang: "עברית", group: "he", site: "https://www.hidabroot.org/", host: "hidabroot.org",
-      src: ["https://cdn.cybercdn.live/HidabrootIL/Live97/playlist.m3u8"] },
     { id: "knesset", he: "ערוץ הכנסת", en: "Knesset Channel", lang: "עברית", group: "he", site: "https://www.knesset.tv/", host: "knesset.tv",
       src: ["https://contact.gostreaming.tv/Knesset/index.m3u8"] },
+    { id: "hidabroot", he: "הידברות", en: "Hidabroot", lang: "עברית", group: "he", site: "https://www.hidabroot.org/", host: "hidabroot.org",
+      src: ["https://cdn.cybercdn.live/HidabrootIL/Live97/playlist.m3u8"] },
     { id: "kab", he: "קבלה לעם", en: "Kabbalah for the People", lang: "עברית", group: "he", site: "https://www.kab.co.il/", host: "kab.co.il",
       src: ["https://edge3.uk.kab.tv/live/tv66-heb-high/playlist.m3u8"] },
+    { id: "r13reality", he: "ערוץ הריאליטי", en: "Reality (Reshet 13)", lang: "עברית", group: "he", site: "https://13tv.co.il/", host: "13tv.co.il",
+      src: ["https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8"] },
+    { id: "r13comedy", he: "ערוץ הקומדיה", en: "Comedy (Reshet 13)", lang: "עברית", group: "he", site: "https://13tv.co.il/", host: "13tv.co.il",
+      src: ["https://d15ds134q59udk.cloudfront.net/out/v1/fbba879221d045598540ee783b140fe2/index.m3u8"] },
+    { id: "r13vacation", he: "ערוץ הנופש", en: "Vacation (Reshet 13)", lang: "עברית", group: "he", site: "https://13tv.co.il/", host: "13tv.co.il",
+      src: ["https://d1yd8hohnldm33.cloudfront.net/out/v1/19dee23c2cc24f689bd4e1288661ee0c/index_2.m3u8"] },
     { id: "ch9", he: "ערוץ 9", en: "Channel 9 (Russian)", lang: "русский", group: "other", site: "https://www.9tv.co.il/", host: "9tv.co.il",
       src: ["https://contact.gostreaming.tv/Con-11/index.m3u8"] },
     { id: "i24en", he: "i24NEWS English", en: "i24NEWS English", lang: "English", group: "other", site: "https://www.i24news.tv/en", host: "i24news.tv",
       src: ["https://i24newsenglish-cdn.encoders.immergo.tv/master.m3u8", "https://hlspackager.akamaized.net/live/DB/i24_ENGLISH/HLS/i24_ENGLISH.m3u8"] },
+    { id: "i24fr", he: "i24NEWS Français", en: "i24NEWS French", lang: "Français", group: "other", site: "https://www.i24news.tv/fr", host: "i24news.tv",
+      src: ["https://i24newsfrench-cdn.encoders.immergo.tv/master.m3u8"] },
+    { id: "i24ar", he: "i24NEWS عربي", en: "i24NEWS Arabic", lang: "عربي", group: "other", site: "https://www.i24news.tv/ar", host: "i24news.tv",
+      src: ["https://i24newsarabic-cdn.encoders.immergo.tv/master.m3u8", "https://hlspackager.akamaized.net/live/DB/i24_ARABIC/HLS/i24_ARABIC.m3u8"] },
     { id: "makan33", he: "מכאן 33", en: "Makan 33 (Arabic)", lang: "عربي", group: "other", site: "https://www.kan.org.il/live/", host: "kan.org.il",
       src: ["https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/makan/live.livx/playlist.m3u8"] },
     { id: "hala", he: "Hala TV", en: "Hala TV (Arabic)", lang: "عربي", group: "other", site: "https://panet.com/", host: "panet.com",
-      src: ["https://stream.panet.com/edge/halaTV/playlist.m3u8"] }
+      src: ["https://stream.panet.com/edge/halaTV/playlist.m3u8"] },
+    { id: "pars", he: "Israel Pars TV", en: "Israel Pars TV (Persian)", lang: "فارسی", group: "other", site: "https://pars-israel.com/", host: "pars-israel.com",
+      src: ["https://live.pars-israel.com/tmp_hls/iptv/index.m3u8"] }
   ];
 
-  var STORE_KEY = "israel-tv-last";
+  var STORE_KEY = "israel-tv-last-id";
   var ua = navigator.userAgent || "";
   var isIOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var isSafari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|Edg|OPR|SamsungBrowser/.test(ua);
@@ -476,10 +492,14 @@
   if (isTouch) document.body.classList.add("touch");
 
   function readLast() {
-    try { var v = localStorage.getItem(STORE_KEY); return v ? parseInt(v, 10) : -1; } catch (e) { return -1; }
+    try {
+      var id = localStorage.getItem(STORE_KEY);
+      for (var k = 0; k < CHANNELS.length; k++) { if (CHANNELS[k].id === id) return k; }
+      return -1;
+    } catch (e) { return -1; }
   }
   function writeLast(i) {
-    try { localStorage.setItem(STORE_KEY, String(i)); } catch (e) { }
+    try { localStorage.setItem(STORE_KEY, CHANNELS[i].id); } catch (e) { }
   }
 
   /* Tiles */
