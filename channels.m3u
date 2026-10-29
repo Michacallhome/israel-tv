@@ -1,0 +1,39 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="kan11" tvg-name="Kan 11" tvg-chno="1" group-title="ישראל עברית",כאן 11
+https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8
+#EXTINF:-1 tvg-id="reshet13" tvg-name="Reshet 13" tvg-chno="2" group-title="ישראל עברית",רשת 13
+https://d2xg1g9o5vns8m.cloudfront.net/out/v1/0855d703f7d5436fae6a9c7ce8ca5075/index.m3u8
+#EXTINF:-1 tvg-id="now14" tvg-name="Now 14" tvg-chno="3" group-title="ישראל עברית",עכשיו 14
+https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8
+#EXTINF:-1 tvg-id="kanedu" tvg-name="Kan Hinuchit (23)" tvg-chno="4" group-title="ישראל עברית",כאן חינוכית
+https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan_edu/live.livx/playlist.m3u8
+#EXTINF:-1 tvg-id="i24he" tvg-name="i24NEWS Hebrew" tvg-chno="5" group-title="ישראל עברית",i24NEWS עברית
+https://i24newshebrew-cdn.encoders.immergo.tv/master.m3u8
+#EXTINF:-1 tvg-id="ch16" tvg-name="Channel 16" tvg-chno="6" group-title="ישראל עברית",ערוץ 16
+https://ch16israel-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8
+#EXTINF:-1 tvg-id="knesset" tvg-name="Knesset Channel" tvg-chno="7" group-title="ישראל עברית",ערוץ הכנסת
+https://contact.gostreaming.tv/Knesset/index.m3u8
+#EXTINF:-1 tvg-id="hidabroot" tvg-name="Hidabroot" tvg-chno="8" group-title="ישראל עברית",הידברות
+https://cdn.cybercdn.live/HidabrootIL/Live97/playlist.m3u8
+#EXTINF:-1 tvg-id="kab" tvg-name="Kabbalah for the People" tvg-chno="9" group-title="ישראל עברית",קבלה לעם
+https://edge3.uk.kab.tv/live/tv66-heb-high/playlist.m3u8
+#EXTINF:-1 tvg-id="r13reality" tvg-name="Reality (Reshet 13)" tvg-chno="10" group-title="ישראל עברית",ערוץ הריאליטי
+https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8
+#EXTINF:-1 tvg-id="r13comedy" tvg-name="Comedy (Reshet 13)" tvg-chno="11" group-title="ישראל עברית",ערוץ הקומדיה
+https://d15ds134q59udk.cloudfront.net/out/v1/fbba879221d045598540ee783b140fe2/index.m3u8
+#EXTINF:-1 tvg-id="r13vacation" tvg-name="Vacation (Reshet 13)" tvg-chno="12" group-title="ישראל עברית",ערוץ הנופש
+https://d1yd8hohnldm33.cloudfront.net/out/v1/19dee23c2cc24f689bd4e1288661ee0c/index_2.m3u8
+#EXTINF:-1 tvg-id="ch9" tvg-name="Channel 9 (Russian)" tvg-chno="13" group-title="Israel other languages",Channel 9 (Russian)
+https://contact.gostreaming.tv/Con-11/index.m3u8
+#EXTINF:-1 tvg-id="i24en" tvg-name="i24NEWS English" tvg-chno="14" group-title="Israel other languages",i24NEWS English
+https://i24newsenglish-cdn.encoders.immergo.tv/master.m3u8
+#EXTINF:-1 tvg-id="i24fr" tvg-name="i24NEWS French" tvg-chno="15" group-title="Israel other languages",i24NEWS French
+https://i24newsfrench-cdn.encoders.immergo.tv/master.m3u8
+#EXTINF:-1 tvg-id="i24ar" tvg-name="i24NEWS Arabic" tvg-chno="16" group-title="Israel other languages",i24NEWS Arabic
+https://i24newsarabic-cdn.encoders.immergo.tv/master.m3u8
+#EXTINF:-1 tvg-id="makan33" tvg-name="Makan 33 (Arabic)" tvg-chno="17" group-title="Israel other languages",Makan 33 (Arabic)
+https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/makan/live.livx/playlist.m3u8
+#EXTINF:-1 tvg-id="hala" tvg-name="Hala TV (Arabic)" tvg-chno="18" group-title="Israel other languages",Hala TV (Arabic)
+https://stream.panet.com/edge/halaTV/playlist.m3u8
+#EXTINF:-1 tvg-id="pars" tvg-name="Israel Pars TV (Persian)" tvg-chno="19" group-title="Israel other languages",Israel Pars TV (Persian)
+https://live.pars-israel.com/tmp_hls/iptv/index.m3u8
